@@ -38,6 +38,7 @@ namespace SimpleClimateChanger
 
             AssetDatabase.global.LoadSettings(nameof(SimpleClimateChanger), m_Setting, new Setting(this, weatherSystem));
 
+            // Testing which update system to use, unsure so inclided a few...
             updateSystem.UpdateAfter<ClimateSystem>(SystemUpdatePhase.GameSimulation);
             updateSystem.UpdateAfter<ClimateSystem>(SystemUpdatePhase.Rendering);
             updateSystem.UpdateAfter<ClimateSystem>(SystemUpdatePhase.MainLoop);
