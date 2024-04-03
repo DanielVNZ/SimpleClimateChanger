@@ -6,6 +6,7 @@ using Game.Settings;
 using Game.Simulation;
 using Game.UI;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Unity.Entities;
 
 
@@ -26,7 +27,6 @@ namespace SimpleClimateChanger
         public const string kSliderGroup = "Slider";
 
 
-
         public Setting(IMod mod, DanielsWeatherSystem weatherSystem) : base(mod)
         {
 
@@ -36,7 +36,7 @@ namespace SimpleClimateChanger
 
 
             // Subscribe to the ValueChanged event of MaxTemperature slider
-            
+
 
             //_weatherSystem.UpdateWeather(_mod);
 
@@ -45,6 +45,9 @@ namespace SimpleClimateChanger
                 _weatherSystem.UpdateWeather(_mod);
                 log.Info("Weather updated - MANUAL SETTINGS CHANGE");
             }*/
+
+            Mod.log.Info($"Temp (Local): {MaxTemperature}");
+
 
 
         }
@@ -60,9 +63,11 @@ namespace SimpleClimateChanger
         public float MinTemperature { get; set; }
 
 
-        [SettingsUISlider(min = -20, max = 100, step = 1, scalarMultiplier = 1, unit = Unit.kTemperature)]
+        [SettingsUISlider(min = -50, max = 50, step = 1, scalarMultiplier = 1, unit = Unit.kTemperature)]
         [SettingsUISection(kSection, kSliderGroup)]
         public float MaxTemperature { get; set; }
+        
+
 
         /* get
          {
