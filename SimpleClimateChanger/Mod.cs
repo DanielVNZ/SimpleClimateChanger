@@ -113,9 +113,38 @@ namespace SimpleClimateChanger
                 _climateSystem = World.GetExistingSystemManaged<ClimateSystem>();
                 Mod.log.Info("Climate System found");
 
-                _climateSystem.temperature.overrideState = true;
-                _climateSystem.precipitation.overrideState = true;
-                _climateSystem.cloudiness.overrideState = true;
+                _climateSystem.temperature.overrideState = false;
+                _climateSystem.precipitation.overrideState = false;
+                _climateSystem.cloudiness.overrideState = false;
+
+
+                if (_mod.m_Setting.EnabableTemperature == true)
+                {
+                    _climateSystem.temperature.overrideState = true;
+                }
+                else
+                {
+                    _climateSystem.temperature.overrideState = false;
+                }
+                if (_mod.m_Setting.EnablePrecipitation == true)
+                {
+                    _climateSystem.precipitation.overrideState = true;
+                }
+                else
+                {
+                    _climateSystem.precipitation.overrideState = false;
+                }
+
+                if (_mod.m_Setting.EnableCloudiness == true)
+                {
+                    _climateSystem.cloudiness.overrideState = true;
+                }
+                else
+                {
+                    _climateSystem.cloudiness.overrideState = false;
+                }
+
+
 
 
                 if (_mod == null)
@@ -128,10 +157,26 @@ namespace SimpleClimateChanger
                 }
                 else if (_climateSystem != null && _mod.m_Setting != null && isInitialized == false)
                 {
+                    if (_mod.m_Setting.enableTemperature == true)
+                    {
+                        _climateSystem.temperature.overrideValue = _mod.m_Setting.currentTemp;
+                    }
+                    //_climateSystem.temperature.overrideValue = _mod.m_Setting.currentTemp;
 
-                    _climateSystem.temperature.overrideValue = _mod.m_Setting.currentTemp;
-                    _climateSystem.precipitation.overrideValue = _mod.m_Setting.currentPrecipitation;
-                    _climateSystem.cloudiness.overrideValue = _mod.m_Setting.cloudiness;
+                    if (_mod.m_Setting.enablePrecipitation == true)
+                    {
+                        _climateSystem.precipitation.overrideValue = _mod.m_Setting.currentPrecipitation;
+                    }
+
+                    //_climateSystem.precipitation.overrideValue = _mod.m_Setting.currentPrecipitation;
+
+                    if (_mod.m_Setting.enableCloudiness == true)
+                    {
+                        _climateSystem.cloudiness.overrideValue = _mod.m_Setting.cloudiness;
+                    }
+
+
+                    //_climateSystem.cloudiness.overrideValue = _mod.m_Setting.cloudiness;
 
                     Mod.log.Info("Attempt Apply from GetExistingSystemManaged");
                     _mod.m_Setting.Apply();
@@ -172,13 +217,40 @@ namespace SimpleClimateChanger
 
                 if (_climateSystem != null)
                 {
+                    _climateSystem.temperature.overrideState = false;
+                    _climateSystem.precipitation.overrideState = false;
+                    _climateSystem.cloudiness.overrideState = false;
 
-                    _climateSystem.temperature.overrideState = true;
-                    _climateSystem.precipitation.overrideState = true;
-                    _climateSystem.cloudiness.overrideState = true;
-                    _climateSystem.temperature.overrideValue = temperature;
-                    _climateSystem.precipitation.overrideValue = precipitation;
-                    _climateSystem.cloudiness.overrideValue = cloudiness;
+
+                    if (_mod.m_Setting.EnabableTemperature == true)
+                    {
+                        _climateSystem.temperature.overrideState = true;
+                        _climateSystem.temperature.overrideValue = temperature;
+                    }
+                    else
+                    {
+                        _climateSystem.temperature.overrideState = false;
+                    }
+                    if (_mod.m_Setting.EnablePrecipitation == true)
+                    {
+                        _climateSystem.precipitation.overrideState = true;
+                        _climateSystem.precipitation.overrideValue = precipitation;
+                    }
+                    else
+                    {
+                        _climateSystem.precipitation.overrideState = false;
+                    }
+
+                    if (_mod.m_Setting.EnableCloudiness == true)
+                    {
+                        _climateSystem.cloudiness.overrideState = true;
+                        _climateSystem.cloudiness.overrideValue = cloudiness;
+                    }
+                    else
+                    {
+                        _climateSystem.cloudiness.overrideState = false;
+                    }
+
                     Mod.log.Info("Weather updated successfully.");
 
                 }

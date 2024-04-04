@@ -27,6 +27,9 @@ namespace SimpleClimateChanger
         public float currentTemp;
         public float currentPrecipitation;
         public float cloudiness;
+        public bool  enableTemperature;
+        public bool enablePrecipitation;
+        public bool enableCloudiness;
 
 
         public Setting(IMod mod, DanielsWeatherSystem weatherSystem) : base(mod)
@@ -39,16 +42,29 @@ namespace SimpleClimateChanger
             currentTemp = Temperature;
             currentPrecipitation = Precipitation;
             cloudiness = Cloudiness;
+            enableTemperature = EnabableTemperature;
+            enablePrecipitation = EnablePrecipitation;
+            enableCloudiness = EnableCloudiness;
+
 
         }
+
+        [SettingsUISection(kSection, kSliderGroup)]
+        public bool EnabableTemperature { get; set; }
 
         [SettingsUISlider(min = -50, max = 50, step = 1, scalarMultiplier = 1, unit = Unit.kTemperature)]
         [SettingsUISection(kSection, kSliderGroup)]
         public float Temperature { get; set; }
 
+        [SettingsUISection(kSection, kSliderGroup)]
+        public bool EnablePrecipitation { get; set; }
+
         [SettingsUISlider(min = 0.000f, max = 0.999f, step = 0.001f, scalarMultiplier = 1, unit = Unit.kFloatThreeFractions)]
         [SettingsUISection(kSection, kSliderGroup)]
         public float Precipitation { get; set; }
+
+        [SettingsUISection(kSection, kSliderGroup)]
+        public bool EnableCloudiness { get; set; }
 
         [SettingsUISlider(min = 0.000f, max = 0.999f, step = 0.001f, scalarMultiplier = 1, unit = Unit.kFloatThreeFractions)]
         [SettingsUISection(kSection, kSliderGroup)]
@@ -62,6 +78,9 @@ namespace SimpleClimateChanger
             currentTemp = Temperature;
             currentPrecipitation = Precipitation;
             cloudiness = Cloudiness;
+            enableTemperature = EnabableTemperature;
+            enablePrecipitation = EnablePrecipitation;
+            enableCloudiness = EnableCloudiness;
             _weatherSystem.UpdateWeather(currentTemp, currentPrecipitation, cloudiness); 
            
             Mod.log.Info("Weather updated successfully from Apply method.");
@@ -100,6 +119,14 @@ namespace SimpleClimateChanger
                 { _setting.GetOptionDescLocaleID(nameof(Setting.Precipitation)), $"Use this slider to set the current Precipitation (Rain) volume." },
                 { _setting.GetOptionLabelLocaleID(nameof(Setting.Temperature)), "Current Temprature" },
                 { _setting.GetOptionDescLocaleID(nameof(Setting.Temperature)), $"Use this slider to change the current temperature. (-50 to +50 degrees)" },
+
+                { _setting.GetOptionLabelLocaleID(nameof(Setting.EnabableTemperature)), "Enable Custom Temperature?" },
+                { _setting.GetOptionDescLocaleID(nameof(Setting.EnabableTemperature)), $"Tick to enable a custom temperature value" },
+                { _setting.GetOptionLabelLocaleID(nameof(Setting.EnablePrecipitation)), "Enable Custom Precipitation?" },
+                { _setting.GetOptionDescLocaleID(nameof(Setting.EnablePrecipitation)), $"Tick to enable a custom precipitation value" },
+                { _setting.GetOptionLabelLocaleID(nameof(Setting.EnableCloudiness)), "Enable Custom Cloudiness?" },
+                { _setting.GetOptionDescLocaleID(nameof(Setting.EnableCloudiness)), $"Tick to enable a custom cloudiness value" }
+
             };
         }
 
