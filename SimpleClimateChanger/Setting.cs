@@ -1,101 +1,77 @@
 ﻿using Colossal;
 using Colossal.IO.AssetDatabase;
-using Game;
 using Game.Modding;
 using Game.Settings;
-using Game.Simulation;
 using Game.UI;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using Unity.Entities;
+
 
 
 namespace SimpleClimateChanger
 {
     [FileLocation(nameof(SimpleClimateChanger))]
-    [SettingsUIGroupOrder(kButtonGroup, kDropdownGroup)]
-    [SettingsUIShowGroupName(kButtonGroup, kDropdownGroup)]
+    [SettingsUIGroupOrder(kSliderGroup)]
+    [SettingsUIShowGroupName(kSliderGroup)]
     public class Setting : ModSetting
     {
 
         private readonly Mod _mod;
-        private readonly DanielsWeatherSystem _weatherSystem;
+        private DanielsWeatherSystem _weatherSystem;
+
+
 
         public const string kSection = "Main";
         public const string kButtonGroup = "Button";
         public const string kDropdownGroup = "Dropdown";
         public const string kSliderGroup = "Slider";
+        public float currentTemp;
+        public float currentPrecipitation;
+        public float cloudiness;
 
 
         public Setting(IMod mod, DanielsWeatherSystem weatherSystem) : base(mod)
         {
-
             _mod = (Mod)mod;
             _weatherSystem = weatherSystem;
             Mod.log.Info("Setting initialized");
 
 
-            // Subscribe to the ValueChanged event of MaxTemperature slider
-
-
-            //_weatherSystem.UpdateWeather(_mod);
-
-            /*if (GameManager.instance.gameMode == GameMode.GameOrEditor)
-            {
-                _weatherSystem.UpdateWeather(_mod);
-                log.Info("Weather updated - MANUAL SETTINGS CHANGE");
-            }*/
-
-            Mod.log.Info($"Temp (Local): {MaxTemperature}");
-
-
+            currentTemp = Temperature;
+            currentPrecipitation = Precipitation;
+            cloudiness = Cloudiness;
 
         }
 
-   
-
-        [SettingsUISlider(min = 0, max = 10000, step = 1, scalarMultiplier = 1, unit = Unit.kInteger)]
-        [SettingsUISection(kSection, kSliderGroup)]
-        public int SeedOffset { get; set; }
-
-        [SettingsUISlider(min = -20, max = 100, step = 1, scalarMultiplier = 1, unit = Unit.kInteger)]
-        [SettingsUISection(kSection, kSliderGroup)]
-        public float MinTemperature { get; set; }
-
-
         [SettingsUISlider(min = -50, max = 50, step = 1, scalarMultiplier = 1, unit = Unit.kTemperature)]
         [SettingsUISection(kSection, kSliderGroup)]
-        public float MaxTemperature { get; set; }
-        
+        public float Temperature { get; set; }
 
+        [SettingsUISlider(min = 0.000f, max = 0.999f, step = 0.001f, scalarMultiplier = 1, unit = Unit.kFloatThreeFractions)]
+        [SettingsUISection(kSection, kSliderGroup)]
+        public float Precipitation { get; set; }
 
-        /* get
-         {
-            return _weatherSystem._climateSystem.temperature.overrideValue; // or any default value you want to return if _climateSystem is null
-         }
-         //get { return MaxTemperature; }
-         set
-         {
-             if (_weatherSystem != null && _weatherSystem._climateSystem != null)
-             {
-                 _weatherSystem._climateSystem.temperature.overrideValue = value;
-                 _weatherSystem.UpdateWeather(_mod);
-             }
-             else
-             {
-                 // Handle the case where _weatherSystem or _climateSystem is null
-                 log.Warn("Weather system or climate system is not properly initialized.");
-
-             }
-         }*/
+        [SettingsUISlider(min = 0.000f, max = 0.999f, step = 0.001f, scalarMultiplier = 1, unit = Unit.kFloatThreeFractions)]
+        [SettingsUISection(kSection, kSliderGroup)]
+        public float Cloudiness { get; set; }
 
 
 
+        public override void Apply()
+        {
+            Mod.log.Info("Running Apply method..........");
+            currentTemp = Temperature;
+            currentPrecipitation = Precipitation;
+            cloudiness = Cloudiness;
+            _weatherSystem.UpdateWeather(currentTemp, currentPrecipitation, cloudiness); 
+           
+            Mod.log.Info("Weather updated successfully from Apply method.");
+        }
 
 
         public override void SetDefaults()
         {
-            // Set default values if needed
+            Mod.log.Info("SetDefaults Ran Successfully");
+
         }
     }
 
@@ -110,23 +86,26 @@ namespace SimpleClimateChanger
         {
             return new Dictionary<string, string>
             {
-                { _setting.GetSettingsLocaleID(), "Mod settings sample" },
-                { _setting.GetOptionTabLocaleID(Setting.kSection), "Main" },
+                { _setting.GetSettingsLocaleID(), "Weather+" },
+                { _setting.GetOptionTabLocaleID(Setting.kSection), "Current Weather" },
                 { _setting.GetOptionGroupLocaleID(Setting.kButtonGroup), "Buttons" },
-                { _setting.GetOptionGroupLocaleID(Setting.kSliderGroup), "Sliders" },
-                { _setting.GetOptionGroupLocaleID(Setting.kDropdownGroup), "Dropdowns" },
-                { _setting.GetOptionLabelLocaleID(nameof(Setting.MinTemperature)), "Minimum Temperature" },
-                { _setting.GetOptionDescLocaleID(nameof(Setting.MinTemperature)), $"Use this slider to set the minimum temperature" },
-                { _setting.GetOptionLabelLocaleID(nameof(Setting.MaxTemperature)), "Maximum Temperature" },
-                { _setting.GetOptionDescLocaleID(nameof(Setting.MaxTemperature)), $"Use this slider to set the maximum temperature" },
-                { _setting.GetOptionLabelLocaleID(nameof(Setting.SeedOffset)), "Seed Offset" },
-                { _setting.GetOptionDescLocaleID(nameof(Setting.SeedOffset)), $"Use this slider to set the seed offset" }
+                { _setting.GetOptionGroupLocaleID(Setting.kSliderGroup), "Change Current Weather" },
+                { _setting.GetOptionDescLocaleID(Setting.kSection), "Change the current weather settings." },
+                { _setting.GetOptionLabelLocaleID(Setting.kDropdownGroup), "Change Current Weather" },
+
+
+                { _setting.GetOptionLabelLocaleID(nameof(Setting.Cloudiness)), "Current Cloudiness" },
+                { _setting.GetOptionDescLocaleID(nameof(Setting.Cloudiness)), $"Use this slider to set the current Cloudiness." },
+                { _setting.GetOptionLabelLocaleID(nameof(Setting.Precipitation)), "Current Precipitation (Rain)" },
+                { _setting.GetOptionDescLocaleID(nameof(Setting.Precipitation)), $"Use this slider to set the current Precipitation (Rain) volume." },
+                { _setting.GetOptionLabelLocaleID(nameof(Setting.Temperature)), "Current Temprature" },
+                { _setting.GetOptionDescLocaleID(nameof(Setting.Temperature)), $"Use this slider to change the current temperature. (-50 to +50 degrees)" },
             };
         }
 
         public void Unload()
         {
-            // Cleanup resources if needed
+            
         }
     }
 }
