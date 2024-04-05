@@ -10,8 +10,8 @@ using System.Collections.Generic;
 namespace SimpleClimateChanger
 {
     [FileLocation(nameof(SimpleClimateChanger))]
-    [SettingsUIGroupOrder(kSliderGroup)]
-    [SettingsUIShowGroupName(kSliderGroup)]
+    [SettingsUIGroupOrder(kSliderGroup, kDropdownGroup)]
+    [SettingsUIShowGroupName(kSliderGroup, kDropdownGroup)]
     public class Setting : ModSetting
     {
 
@@ -21,6 +21,7 @@ namespace SimpleClimateChanger
 
 
         public const string kSection = "Main";
+        public const string kSection2 = "Time";
         public const string kButtonGroup = "Button";
         public const string kDropdownGroup = "Dropdown";
         public const string kSliderGroup = "Slider";
@@ -30,6 +31,11 @@ namespace SimpleClimateChanger
         public bool  enableTemperature;
         public bool enablePrecipitation;
         public bool enableCloudiness;
+
+        public bool night;
+        public bool default1;
+        public bool day;
+        public bool goldenHour;
 
 
         public Setting(IMod mod, DanielsWeatherSystem weatherSystem) : base(mod)
@@ -45,9 +51,15 @@ namespace SimpleClimateChanger
             enableTemperature = EnabableTemperature;
             enablePrecipitation = EnablePrecipitation;
             enableCloudiness = EnableCloudiness;
+            night = Night;
+            default1 = Default;
+            day = Day;
 
+            Default = true;
 
         }
+
+        //Page1 - Weather Information
 
         [SettingsUISection(kSection, kSliderGroup)]
         public bool EnabableTemperature { get; set; }
@@ -71,6 +83,21 @@ namespace SimpleClimateChanger
         public float Cloudiness { get; set; }
 
 
+        //Page2 - Time Information
+
+        [SettingsUISection(kSection2, kDropdownGroup)]
+        public bool Default { get; set; }
+
+
+        [SettingsUISection(kSection2, kDropdownGroup)]
+        public bool Night { get; set; }
+
+        [SettingsUISection(kSection2, kDropdownGroup)]
+        public bool Day { get; set; }
+
+
+
+
 
         public override void Apply()
         {
@@ -81,9 +108,39 @@ namespace SimpleClimateChanger
             enableTemperature = EnabableTemperature;
             enablePrecipitation = EnablePrecipitation;
             enableCloudiness = EnableCloudiness;
+            night = Night;
+            default1 = Default;
+            day = Day;
+            _weatherSystem.UpdateTimeOfDay(night, default1, day);
             _weatherSystem.UpdateWeather(currentTemp, currentPrecipitation, cloudiness); 
            
             Mod.log.Info("Weather updated successfully from Apply method.");
+
+
+
+
+
+            if (Default == true)
+            {
+                Night = false;
+                Day = false;
+            }
+            else if (Night == true)
+            {
+                Mod.log.Info("Night is true");
+                Day = false;
+                Default = false;
+            }
+            else if (Day == true)
+            {
+                Mod.log.Info("Day is true");
+                Night = false;
+                Default = false;
+            }
+            else
+            {
+                Mod.log.Info("No time of day selected");
+            }
         }
 
 
@@ -106,18 +163,19 @@ namespace SimpleClimateChanger
             return new Dictionary<string, string>
             {
                 { _setting.GetSettingsLocaleID(), "Weather+" },
-                { _setting.GetOptionTabLocaleID(Setting.kSection), "Current Weather" },
+                { _setting.GetOptionTabLocaleID(Setting.kSection), "Weather Settings" },
+                { _setting.GetOptionTabLocaleID(Setting.kSection2), "Time Settings" },
                 { _setting.GetOptionGroupLocaleID(Setting.kButtonGroup), "Buttons" },
                 { _setting.GetOptionGroupLocaleID(Setting.kSliderGroup), "Change Current Weather" },
                 { _setting.GetOptionDescLocaleID(Setting.kSection), "Change the current weather settings." },
-                { _setting.GetOptionLabelLocaleID(Setting.kDropdownGroup), "Change Current Weather" },
+                { _setting.GetOptionGroupLocaleID(Setting.kDropdownGroup), "Change Visual Time Settings. De-select an option prior to changing" },
 
 
                 { _setting.GetOptionLabelLocaleID(nameof(Setting.Cloudiness)), "Current Cloudiness" },
                 { _setting.GetOptionDescLocaleID(nameof(Setting.Cloudiness)), $"Use this slider to set the current Cloudiness." },
                 { _setting.GetOptionLabelLocaleID(nameof(Setting.Precipitation)), "Current Precipitation (Rain)" },
                 { _setting.GetOptionDescLocaleID(nameof(Setting.Precipitation)), $"Use this slider to set the current Precipitation (Rain) volume." },
-                { _setting.GetOptionLabelLocaleID(nameof(Setting.Temperature)), "Current Temprature" },
+                { _setting.GetOptionLabelLocaleID(nameof(Setting.Temperature)), "Current Temperature" },
                 { _setting.GetOptionDescLocaleID(nameof(Setting.Temperature)), $"Use this slider to change the current temperature. (-50 to +50 degrees)" },
 
                 { _setting.GetOptionLabelLocaleID(nameof(Setting.EnabableTemperature)), "Enable Custom Temperature?" },
@@ -125,7 +183,15 @@ namespace SimpleClimateChanger
                 { _setting.GetOptionLabelLocaleID(nameof(Setting.EnablePrecipitation)), "Enable Custom Precipitation?" },
                 { _setting.GetOptionDescLocaleID(nameof(Setting.EnablePrecipitation)), $"Tick to enable a custom precipitation value" },
                 { _setting.GetOptionLabelLocaleID(nameof(Setting.EnableCloudiness)), "Enable Custom Cloudiness?" },
-                { _setting.GetOptionDescLocaleID(nameof(Setting.EnableCloudiness)), $"Tick to enable a custom cloudiness value" }
+                { _setting.GetOptionDescLocaleID(nameof(Setting.EnableCloudiness)), $"Tick to enable a custom cloudiness value" },
+
+
+                { _setting.GetOptionLabelLocaleID(nameof(Setting.Default)), "Default" },
+                { _setting.GetOptionDescLocaleID(nameof(Setting.Default)), $"Stops overriding the time and goes back to vanilla behaivour" },
+                { _setting.GetOptionLabelLocaleID(nameof(Setting.Night)), "Night" },
+                { _setting.GetOptionDescLocaleID(nameof(Setting.Night)), $"Sets the time to night" },
+                { _setting.GetOptionLabelLocaleID(nameof(Setting.Day)), "Day" },
+                { _setting.GetOptionDescLocaleID(nameof(Setting.Day)), $"Sets the time to day" },
 
             };
         }

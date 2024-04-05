@@ -75,6 +75,7 @@ namespace SimpleClimateChanger
 
  
         public ClimateSystem _climateSystem;
+        public PlanetarySystem _planetarySystem;
         public bool isInitialized = false;
         public Mod _mod;
         public DanielsWeatherSystem _weather;
@@ -111,6 +112,9 @@ namespace SimpleClimateChanger
             if (mode.IsGameOrEditor())
             {
                 _climateSystem = World.GetExistingSystemManaged<ClimateSystem>();
+                Mod.log.Info("Climate System found");
+
+                _planetarySystem = World.GetExistingSystemManaged<PlanetarySystem>();
                 Mod.log.Info("Climate System found");
 
                 _climateSystem.temperature.overrideState = false;
@@ -204,6 +208,32 @@ namespace SimpleClimateChanger
         }
 
 
+        public void UpdateTimeOfDay(bool Night, bool Default, bool Day)
+        {
+
+            if (_planetarySystem != null && Default == true)
+            {
+                _planetarySystem.overrideTime = false;
+
+            }
+            else if (_planetarySystem != null && Night == true)
+            {
+                _planetarySystem.overrideTime = true;
+                _planetarySystem.time = 0f;
+            }
+            else if (_planetarySystem != null && Day == true)
+            {
+                _planetarySystem.overrideTime = true;
+                _planetarySystem.time = 12f;
+
+            }
+            else
+            {
+                Mod.log.Warn("Planetary system is null, unable to update time of day.");
+            }
+        }
+
+
         public void UpdateWeather(float temperature, float precipitation, float cloudiness)
         {
 
@@ -214,6 +244,9 @@ namespace SimpleClimateChanger
 
                 _climateSystem = World.GetExistingSystemManaged<ClimateSystem>();
                 Mod.log.Info("UpdateWeather Ran Successfully");
+
+
+                
 
                 if (_climateSystem != null)
                 {
